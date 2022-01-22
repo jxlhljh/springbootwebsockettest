@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>WEB远程桌面</title>
+    <link rel="stylesheet" href="../css/init.css" />
+</head>
+<body>
+
+<!--image标签，用于远程桌面的截图显示-->
+<img id="imageId" src='' style='position:fixed;width:100%;height:100%'/>
+
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script src="../js/websocketclient.js" charset="utf-8"></script>
+
+<script>
+
+    //websocketClient
+    var client = null;
+
+    //获取accessToken，简单的请求下后台接口判断accessToken是否正确
+    //accessToken默认为123456
+    //如果token有问题，不进行连接
+    var accessToken = getQueryVariable("accessToken") ;
+
+    //请求Token信息验证
+    $.ajax({
+        url:  window.location.origin + '/tokenController/check?accessToken=' + accessToken,
+        type: 'get',
+        success: function (res) {
+            if(res === "success"){
+                //启动远程桌面
+    			startRemoteWin();
+            }else {
+            	alert("accessToken check error.");
+            }
+        },
+        error: function (result) {
+            
+        }
+    });
+
+	//计算imageId的宽和高变量
+	var imageWidth = $("#imageId").width();
+	var imageHeight = $("#imageId").height();
+	
+	//当浏览器大小变化时，更新imageId的宽和高变量
+	$(window).resize( function  () {
+		imageWidth = $("#imageId").width();
+		imageHeight = $("#imageId").height();
+	});
+	
+    //Jquery禁用网页右键菜单
+    $(document).bind("contextmenu",function(e){
+        return false; 
+    });
+
+    //键盘被按下去事件
+    $(document).keydown(function (event) {
+        var obj = new Object();
+        obj.openType = "keydown";
+        obj.keyCode = event.which || event.keyCode;
+        client.sendClientData(obj);//将数据通过websocket发送到后台进行重放
+
+        //禁用一些快捷键
+        if (event.ctrlKey && window.event.keyCode==65){ //禁用ctrl + a 功能
+            return false;
+        }
+        
+        //禁用一些快捷键
+        if (event.ctrlKey && window.event.keyCode==67){	//禁用ctrl + c 功能
+            return false;
+        }
+        
+        //禁用一些快捷键
+        if (event.ctrlKey && window.event.keyCode==83){	//禁用ctrl + s 功能
+            return false;
+        }
+
+        //禁用一些快捷键
+        if (event.ctrlKey && window.event.keyCode==86){	//禁用ctrl + v 功能
+            return false;
+        }
+
+        //你想禁用其他快捷键时
+        //console.log(event);
+        //比如说我按下 A键 keyCode=65 获取到keyCode，然后按以上的方法禁止
+        //目前F1到F12还没有禁用，如果需要的话可以加上。
+
+    });
+    
+    //键盘被弹起来事件
+    $(document).keyup(function (event) {
+        var obj = new Object();
+        obj.openType = "keyup";
+        obj.keyCode = event.which || event.keyCode;
+        client.sendClientData(obj);
+    });
+    
+    //鼠标按钮被按下
+    $(document).mousedown(function (event) {
+        var obj = new Object();
+        obj.openType = "mousedown";
+        obj.button = event.button;
+        obj.clientX = event.clientX; //需要在后台重新计算转换成远程桌面上的真实的坐标
+        obj.clientY = event.clientY; //需要在后台重新计算转换成远程桌面上的真实的坐标
+        obj.imageWidth = imageWidth;
+        obj.imageHeight = imageHeight;
+        client.sendClientData(obj);
+
+    });
+    
+    //鼠标按钮被松开
+    $(document).mouseup(function (event) {
+        var obj = new Object();
+        obj.openType = "mouseup";
+        obj.button = event.button;
+        obj.clientX = event.clientX;
+        obj.clientY = event.clientY;
+        obj.imageWidth = imageWidth;//当前浏览器下image标签占用的宽和高,传这两个值到后台用于修正真实的点击的x和y坐标
+        obj.imageHeight = imageHeight;
+        client.sendClientData(obj);
+        
+    });
+    
+    //鼠标移动事件
+    $(document).mousemove(function(event){
+        var obj = new Object();
+        obj.openType = "mousemove";
+        obj.button = event.button;
+        obj.pageX = event.pageX;
+        obj.pageY = event.pageY;
+        obj.imageWidth = imageWidth;
+        obj.imageHeight = imageHeight;
+        client.sendClientData(obj);
+        
+    });
+    
+    //远程桌面连接函数
+    function startRemoteWin(options){
+    	
+    	//修改title
+    	$('title').html("WEB远程桌面【连接中...】");
+    
+        client = new WebsocketClient();
+        
+        //执行连接操作
+        client.connect({
+            onError: function (error) {
+                //连接失败回调
+                console.log("Error");
+                
+                //设置连接失败后的title
+                $('title').html("WEB远程桌面【连接失败】");
+                
+            },
+            onConnect: function () {
+                //连接成功回调
+                console.log("连接成功回调\r\n");
+                
+                //设置成功连接后的title
+                $('title').html("WEB远程桌面【连接成功】");
+                
+            },
+            onClose: function () {
+                //连接关闭回调
+                console.log("\rconnection closed, now reconnect comtempt..");
+                //alert("Websocket连接已关闭");
+                startRemoteWin();
+            },
+            onData: function (data) {
+                //收到数据时回调
+                //console.log(data);
+                //判断websocket的消息是二进制还是字符串
+                if (typeof(data) === 'string') {
+                    console.log("string");
+                } else {
+                    //console.log("bin");
+                    //后台是通过Java的Awt工具将图片转成了二进制流回来
+                    //因此在这里将二进制流作一下处理，将新传回来的截图imageId的image标签中修改src，达到远程控制的效果
+                    //将图片刷到浏览器上显示
+                    const blob = new Blob([data], { type: "image/jpg" });
+                    document.getElementById("imageId").src = window.URL.createObjectURL(blob);
+                    
+                }
+            }
+        });
+        
+
+		
+
+        
+    }
+
+    //获取浏览器地址上的url参数
+    function getQueryVariable(variable){
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return "";
+    }
+
+</script>
+</body>
+</html>

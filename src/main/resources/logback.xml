@@ -1,0 +1,204 @@
+<configuration>
+	<property name="log_dir" value="./logs" />生产环境使用绝对路径
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		encoder 默认配置为PatternLayoutEncoder
+		<encoder>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log_dir}/log.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${log_dir}/log.log.%i</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
+
+<!-- <configuration>
+    <property name="log_dir" value="./logs" />
+    生产环境使用绝对路径
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        encoder 默认配置为PatternLayoutEncoder
+        <encoder>
+            <pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/log.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxHistory>7</maxHistory>
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+        </encoder>
+    </appender>
+
+	<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${log_dir}/error.log</file>
+	    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+	      	<fileNamePattern>${log_dir}/%d{yyyy-MM-dd}/%d{yyyy-MM-dd}.%i.error.log.zip</fileNamePattern>
+	      	<maxHistory>7</maxHistory>
+	       	<maxFileSize>1MB</maxFileSize>
+	    </rollingPolicy>
+	    <encoder>
+	      	<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+	    </encoder>
+	</appender>
+	
+    不同的业务逻辑日志打印到指定文件夹
+  	<logger name="ERROR" additivity="false" level="INFO">
+  		<appender-ref ref="STDOUT" />
+    	<appender-ref ref="ERROR"/>
+  	</logger>
+    
+    <root level="INFO">
+	    <appender-ref ref="STDOUT" />
+	    <appender-ref ref ="FILE"/>
+    </root>
+    
+</configuration> -->
+
+<!-- <configuration>
+	<property name="log_dir" value="./logs" />生产环境使用绝对路径
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		encoder 默认配置为PatternLayoutEncoder
+		<encoder>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log_dir}/log.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${log_dir}/log.log.%i</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration> -->
+
+<!-- <configuration>
+	<property name="log_dir" value="./logs" />生产环境使用绝对路径
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		encoder 默认配置为PatternLayoutEncoder
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %5p [%t] %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} - %m%n</pattern>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_dir}/log.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<MaxHistory>7</MaxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %5p [%t] %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} - %m%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration> -->
+
+<!-- <configuration>
+	<property name="log_dir" value="./logs" />生产环境使用绝对路径
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		encoder 默认配置为PatternLayoutEncoder
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %5p [%t] %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} - %m%n</pattern>
+			<pattern>%d %5p [%t] %c.%M:%L - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log_dir}/log.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${log_dir}/log.log.%i</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>10MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss,SSS} %5p [%t] %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''} - %m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration> -->
+
+<!-- 
+<?xml version="1.0" encoding="UTF-8"?>
+configuration to be enabled when the "prod" profile is not active
+<configuration debug="false" scan="true" scanPeriod="1 seconds">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <jmxConfigurator/>
+    <contextName>fast-cloud-zuul-api-gateway</contextName>
+
+    <property name="log.path" value="logs/fast-cloud-zuul-api-gateway.log"/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter" >
+             <level>WARN</level>
+         </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <MaxHistory>10</MaxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{36} [%file : %line] %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+
+</configuration> -->
